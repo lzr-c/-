@@ -1,46 +1,51 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class Competition {
-    public static void main(String[] args) {
-        Map<RatCar, Double> distanceMap = new HashMap<>() {
-            {
-                put(new PoliceCar("警車"), 0.0);
-                put(new GarbageTruck("垃圾車"), 0.0);
-                put(new Ambulance("救護車"), 0.0);
-            }
-        };
+    private List<RatCar> cars;
+    private double end;
+    private int time;
 
-        double end = 4000;
-        int time = 0;
+    public Competition(List<RatCar> cars) {
+        this.cars = cars;
+        this.end = 4000;
+        this.time = 0;
+    }
 
-        while (distanceMap.values().stream().allMatch(d -> d < end)) {
-            if (time > 0 && time % 10 == 0) {
-                checkFood(distanceMap);
-            }
-            for (RatCar ratCar : distanceMap.keySet()) {
-                ratCar.move(1);
-                distanceMap.put(ratCar, ratCar.getPosition());
-            }
+    public void start() {
+
+        System.out.println("比賽開始！");
+        while (true) {
             time++;
+            if (time % 10 == 0)
+                checkFood();
+            for (RatCar car : cars)
+                car.move(1);
+            if (cars.stream().anyMatch(c -> c.getPosition() >= end))
+                break;
         }
 
         System.out.println("比賽結束！");
-        for (RatCar ratCar : distanceMap.keySet()) {
-            System.out.println(ratCar.name + "跑了 " + distanceMap.get(ratCar) + " 公尺");
-        }
+        for (RatCar car : cars)
+            System.out.println(car.name + "跑了 " + car.getPosition() + " 公尺");
     }
 
-    public static void checkFood(Map<RatCar, Double> distanceMap) {
-        double maxPosition = distanceMap.values().stream().max(Double::compare).get();
-        double minPosition = distanceMap.values().stream().min(Double::compare).get();
-        for (RatCar ratCar : distanceMap.keySet()) {
-            if (distanceMap.get(ratCar) == maxPosition) {
-                ratCar.eat("生菜");
-            }
-            if (distanceMap.get(ratCar) == minPosition) {
-                ratCar.eat("紅蘿蔔");
+    private void checkFood() {
+        double maxPosition = cars.stream().mapToDouble(RatCar::getPosition).max().orElse(0);
+        double minPosition = cars.stream().mapToDouble(RatCar::getPosition).min().orElse(0);
+
+        Food lettuce = new Lettuce();
+        Food carrot = new Carrot();
+        System.out.println("第 " + time + " 秒，食物出現！");
+        for (RatCar car : cars) {
+            if (car.getPosition() == maxPosition) {
+                car.eat(lettuce);
+            } else if (car.getPosition() == minPosition) {
+                car.eat(carrot);
             }
         }
+        for (RatCar car : cars) {
+            System.out.println(car.name + "當前位置：" + car.getPosition());
+        }
+        System.out.println("--------------------");
     }
 }

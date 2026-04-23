@@ -36,11 +36,9 @@ public abstract class RatCar implements Rat, Car {
     }
 
     @Override
-    public void eat(String food) {
-        stomachC.add(food);
-        if (food.equals("紅蘿蔔")) {
-            effect();
-        }
+    public void eat(Food food) {
+        stomachC.add(food.name());
+        food.effect(this);
         if (stomachC.size() > 5) {
             pupu();
         }
@@ -52,6 +50,22 @@ public abstract class RatCar implements Rat, Car {
         stomachC.clear();
         reset();
     }
+}
 
-    protected abstract void effect();
+class PoliceCar extends RatCar {
+    public PoliceCar(String name) {
+        super(name, 14);
+    }
+}
+
+class Ambulance extends RatCar {
+    public Ambulance(String name) {
+        super(name, 11);
+    }
+}
+
+class GarbageTruck extends RatCar {
+    public GarbageTruck(String name) {
+        super(name, 8);
+    }
 }
